@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install maturin pytest djangorestframework
+    - name: Build and install extension
+      run: |
+        cd drf_accelerator
+        maturin develop
+    - name: Run tests
+      run: |
+        cd drf_accelerator
+        pytest
+  
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.13'
+    - name: Install ruff
+      run: pip install ruff
+    - name: Run ruff
+      run: |
+        cd drf_accelerator
+        ruff check .
+        ruff format --check .

@@ -1,0 +1,39 @@
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[project]
+name = "drf_accelerator"
+version = "0.1.0"
+description = "A high-performance Rust-backed accelerator for Django Rest Framework."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+authors = [
+    {name = "Pravin", email = "pravin@example.com"},
+]
+classifiers = [
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: Implementation :: CPython",
+    "Programming Language :: Python :: Implementation :: PyPy",
+    "Framework :: Django",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = [
+    "djangorestframework>=3.12.0",
+]
+
+[tool.maturin]
+python-source = "."
+module-name = "drf_accelerator.drf_accelerator"
+
+[tool.ruff]
+line-length = 88
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W", "UP"]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["drf_accelerator"]
