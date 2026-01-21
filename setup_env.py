@@ -1,13 +1,12 @@
-
 import os
 import sys
 import subprocess
-import time
-from pathlib import Path
+
 
 def run_cmd(cmd):
     print(f"Running: {cmd}")
     subprocess.check_call(cmd, shell=True)
+
 
 def setup():
     # 1. Create venv
@@ -22,17 +21,17 @@ def setup():
     python = "venv/bin/python"
     if not os.path.exists("bench_project"):
         run_cmd(f"{python} -m django startproject bench_project")
-    
+
     # 4. Create App
     os.chdir("bench_project")
     if not os.path.exists("bench_app"):
         run_cmd(f"../{python} manage.py startapp bench_app")
-    
+
     # 5. Configure Settings
     settings_path = "bench_project/settings.py"
     with open(settings_path, "r") as f:
         content = f.read()
-    
+
     if "rest_framework" not in content:
         content = content.replace(
             "INSTALLED_APPS = [",
@@ -66,11 +65,11 @@ class BookSerializer(serializers.ModelSerializer):
 """
     with open("bench_app/serializers.py", "w") as f:
         f.write(serializers_code)
-    
+
     # 7. Migrate and Populate
     run_cmd(f"../{python} manage.py makemigrations")
     run_cmd(f"../{python} manage.py migrate")
-    
+
     populate_script = """
 import os
 import django
@@ -114,7 +113,10 @@ if __name__ == "__main__":
     with open("benchmark.py", "w") as f:
         f.write(populate_script)
 
-    print("Setup complete. Run 'venv/bin/python bench_project/benchmark.py' to benchmark.")
+    print(
+        "Setup complete. Run 'venv/bin/python bench_project/benchmark.py' to benchmark."
+    )
+
 
 if __name__ == "__main__":
     setup()

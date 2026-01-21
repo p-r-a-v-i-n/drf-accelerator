@@ -1,20 +1,21 @@
-
 import os
 import django
 import random
 import time
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'bench_project.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bench_project.settings")
 django.setup()
 
-from bench_app.models import Book
-from bench_app.serializers import BookSerializer
-from rest_framework import serializers
+from bench_app.models import Book  # noqa: E402
+from bench_app.serializers import BookSerializer  # noqa: E402
+from rest_framework import serializers  # noqa: E402
+
 
 class BaselineBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ["id", "title", "author", "description"]
+
 
 def run_benchmark():
     count = 10000
@@ -22,10 +23,10 @@ def run_benchmark():
         print("Populating database...")
         books = [
             Book(
-                title=f"Book {i}", 
-                author=f"Author {i}", 
-                description="Some description " * 10, 
-                price=random.uniform(10.0, 100.0)
+                title=f"Book {i}",
+                author=f"Author {i}",
+                description="Some description " * 10,
+                price=random.uniform(10.0, 100.0),
             )
             for i in range(count)
         ]
@@ -33,7 +34,7 @@ def run_benchmark():
         print("Done.")
 
     queryset = list(Book.objects.all())  # Force to list once to avoid DB diffs
-    
+
     print(f"Benchmarking {len(queryset)} items...")
 
     # 1. Baseline DRF
@@ -51,13 +52,16 @@ def run_benchmark():
     end = time.time()
     accelerated_time = end - start
     print(f"  - Accelerated (Mixin): {accelerated_time:.4f}s")
-    
+
     print(f"\nSpeedup: {baseline_time / accelerated_time:.2f}x")
 
     # Correctness check
     assert len(baseline_data) == len(accelerated_data), "Length mismatch!"
-    assert baseline_data[0] == accelerated_data[0], f"Data mismatch! \nBase: {baseline_data[0]}\nAcc: {accelerated_data[0]}"
+    assert (
+        baseline_data[0] == accelerated_data[0]
+    ), f"Data mismatch! \nBase: {baseline_data[0]}\nAcc: {accelerated_data[0]}"
     print("Correctness check passed!")
+
 
 if __name__ == "__main__":
     run_benchmark()
