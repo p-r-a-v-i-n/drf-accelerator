@@ -3,6 +3,9 @@ target/
 
 # Python
 __pycache__/
+examples/__pycache__/
+examples/venv/
+examples/db.sqlite3
 *.so
 .pytest_cache/
 .ruff_cache/

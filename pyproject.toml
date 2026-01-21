@@ -41,8 +41,9 @@ module-name = "drf_accelerator.drf_accelerator"
 
 [tool.ruff]
 target-version = "py312"
-
 line-length = 88
+exclude = [ "examples" ]
+
 lint.select = [ "E", "F", "I", "UP", "W" ]
 lint.ignore = [  ]
 lint.isort.known-first-party = [ "drf_accelerator" ]
