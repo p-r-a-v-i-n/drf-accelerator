@@ -20,7 +20,7 @@ Thank you for your interest in contributing! This project is an experimental eff
 
 2. **Install development dependencies**:
    ```bash
-   pip install -e .[dev]
+   pip install -e . --group dev
    # Or manually:
    pip install maturin ruff pre-commit djangorestframework
    ```

@@ -1,6 +1,6 @@
 import os
-import sys
 import subprocess
+import sys
 
 
 def run_cmd(cmd):
@@ -29,7 +29,7 @@ def setup():
 
     # 5. Configure Settings
     settings_path = "bench_project/settings.py"
-    with open(settings_path, "r") as f:
+    with open(settings_path) as f:
         content = f.read()
 
     if "rest_framework" not in content:
@@ -88,9 +88,9 @@ def run_benchmark():
         print("Populating database...")
         books = [
             Book(
-                title=f"Book {i}", 
-                author=f"Author {i}", 
-                description="Some description " * 10, 
+                title=f"Book {i}",
+                author=f"Author {i}",
+                description="Some description " * 10,
                 price=random.uniform(10.0, 100.0)
             )
             for i in range(count)
@@ -104,7 +104,7 @@ def run_benchmark():
     serializer = BookSerializer(queryset, many=True)
     data = serializer.data
     end = time.time()
-    
+
     print(f"Serialized {len(data)} items in {end - start:.4f} seconds")
 
 if __name__ == "__main__":

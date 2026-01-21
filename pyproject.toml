@@ -9,12 +9,10 @@ description = "A high-performance Rust-backed accelerator for Django Rest Framew
 readme = "README.md"
 license = { text = "MIT" }
 
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 classifiers = [
   "Framework :: Django",
   "Programming Language :: Python :: 3 :: Only",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
   "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
   "Programming Language :: Python :: 3.12",
@@ -29,13 +27,20 @@ dependencies = [
   "djangorestframework>=3.12",
 ]
 
+[dependency-groups]
+dev = [
+  "maturin>=1,<2",
+  "pre-commit",
+  "ruff",
+]
+
 [tool.maturin]
 python-source = "drf_accelerator"
 manifest-path = "drf_accelerator/Cargo.toml"
 module-name = "drf_accelerator.drf_accelerator"
 
 [tool.ruff]
-target-version = "py38"
+target-version = "py312"
 
 line-length = 88
 lint.select = [ "E", "F", "I", "UP", "W" ]

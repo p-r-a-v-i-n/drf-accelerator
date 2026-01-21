@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from drf_accelerator import FastSerializationMixin
+
 from .models import Book
 
 

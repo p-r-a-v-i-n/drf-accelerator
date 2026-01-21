@@ -1,7 +1,8 @@
 import os
-import django
 import random
 import time
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "bench_project.settings")
 django.setup()
