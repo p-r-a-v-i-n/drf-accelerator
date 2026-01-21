@@ -27,7 +27,7 @@ Currently, the package is in early development. To install it from source:
    ```
 3. **Build and Install**:
    ```bash
-   pip install .
+   pip install -e .
    ```
 
 ### For Developers (Try it out)
