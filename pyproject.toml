@@ -30,7 +30,8 @@ dependencies = [
 ]
 
 [tool.maturin]
-python-source = "."
+python-source = "drf_accelerator"
+manifest-path = "drf_accelerator/Cargo.toml"
 module-name = "drf_accelerator.drf_accelerator"
 
 [tool.ruff]
