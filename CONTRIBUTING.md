@@ -33,20 +33,20 @@ Thank you for your interest in contributing! This project is an experimental eff
 ## Development Workflow
 
 ### Building the Rust Extension
-The project uses `maturin` to bridge Rust and Python. To build the extension in development mode (which symlinks the binary into your site-packages):
+The project uses `maturin` to bridge Rust and Python.
 ```bash
+cd drf_accelerator
 maturin develop
-```
-For performance testing, use:
-```bash
+# For performance testing use:
 maturin develop --release
 ```
 
 ### Running Benchmarks
 We use a sample Django project to measure performance:
 ```bash
-python setup_env.py  # Run once to set up the bench project
-python bench_project/benchmark.py
+cd examples
+python manage.py migrate
+python bench.py
 ```
 
 ## Guidelines

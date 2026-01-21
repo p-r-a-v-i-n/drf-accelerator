@@ -31,7 +31,7 @@ Currently, the package is in early development. To install it from source:
    ```
 
 ### For Developers (Try it out)
-If you want to run the benchmarks and see the speedup yourself:
+If you want to run the benchmarks yourself:
 
 1. **Build the extension**:
    ```bash
@@ -40,9 +40,10 @@ If you want to run the benchmarks and see the speedup yourself:
    cd ..
    ```
 
-2. **Run the benchmark**:
+2. **Setup and Run Benchmark**:
    ```bash
    cd examples
+   python manage.py migrate
    python bench.py
    ```
 
