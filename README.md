@@ -9,10 +9,10 @@ A high-performance Rust-backed accelerator for Django Rest Framework.
 ## Performance Benchmark
 | Method | Time (10k items) | Speedup |
 | :--- | :--- | :--- |
-| **Standard DRF** | 0.1002s | 1x |
-| **drf-accelerator** | **0.0351s** | **~2.86x** |
+| **Standard DRF** | 0.3288s | 1x |
+| **drf-accelerator** | **0.0389s** | **~8.45x** |
 
-*Benchmark run on 10,000 simple models with 4 primitive fields.*
+*Benchmark run on 10,000 Product models with 5 primitive fields in the `examples` project.*
 
 ## Installation & Setup
 
@@ -33,15 +33,17 @@ Currently, the package is in early development. To install it from source:
 ### For Developers (Try it out)
 If you want to run the benchmarks and see the speedup yourself:
 
-1. **Run the setup script**:
+1. **Build the extension**:
    ```bash
-   python setup_env.py
+   cd drf_accelerator
+   maturin develop --release
+   cd ..
    ```
-   This will create a virtual environment, a sample Django project, and populate the database.
 
 2. **Run the benchmark**:
    ```bash
-   venv/bin/python bench_project/benchmark.py
+   cd examples
+   python bench.py
    ```
 
 ## Usage
