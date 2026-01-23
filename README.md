@@ -17,16 +17,23 @@ A high-performance Rust-backed accelerator for Django Rest Framework.
 ## Installation & Setup
 
 ### For Users (Stable)
-Currently, the package is in early development. To install it from source:
+Install directly from PyPI:
+
+```bash
+pip install drf-accelerator
+```
+
+> [!NOTE]
+> Since this is a Rust extension, you will need a modern Python environment. Pre-built wheels are provided for common platforms.
+
+### From Source
+If you want to install the latest development version:
 
 1. **Prerequisites**: Ensure you have [Rust](https://www.rust-lang.org/tools/install) installed.
-2. **Clone the repository**:
+2. **Clone & Install**:
    ```bash
    git clone https://github.com/p-r-a-v-i-n/drf-accelerator.git
    cd drf-accelerator
-   ```
-3. **Build and Install**:
-   ```bash
    pip install -e .
    ```
 
