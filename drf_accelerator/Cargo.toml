@@ -1,6 +1,9 @@
 [package]
 name = "drf_accelerator"
-version = "0.1.0"
+version = "0.1.0-alpha1"
+description = "A high-performance Rust-backed accelerator for Django Rest Framework."
+license = "MIT"
+repository = "https://github.com/p-r-a-v-i-n/drf-accelerator"
 edition = "2021"
 
 [lib]
