@@ -36,12 +36,12 @@ def test_fast_serializer_primitives():
 
 
 def test_fast_serializer_unsupported_type():
-    from datetime import date
+    from decimal import Decimal
 
     fields = [("d", "d")]
     serializer = FastSerializer(fields)
 
-    obj = SimpleObject(d=date(2023, 1, 1))
+    obj = SimpleObject(d=Decimal("19.99"))
     with pytest.raises(TypeError) as excinfo:
         serializer.serialize([obj])
 
