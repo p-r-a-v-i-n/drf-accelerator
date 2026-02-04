@@ -10,6 +10,7 @@ readme = "README.md"
 license = { text = "MIT" }
 
 requires-python = ">=3.10"
+
 classifiers = [
   "Framework :: Django",
   "Programming Language :: Python :: 3 :: Only",
@@ -19,19 +20,22 @@ classifiers = [
   "Programming Language :: Python :: 3.13",
   "Programming Language :: Python :: 3.14",
   "Programming Language :: Python :: Implementation :: CPython",
-  "Programming Language :: Python :: Implementation :: PyPy",
   "Programming Language :: Rust",
   "Topic :: Software Development :: Libraries :: Python Modules",
 ]
+
 dependencies = [
   "djangorestframework>=3.12",
 ]
 
 [dependency-groups]
 dev = [
-  "maturin>=1,<2",
   "pre-commit",
   "ruff",
+]
+
+test = [
+  "pytest",
 ]
 
 [tool.maturin]
@@ -40,10 +44,9 @@ manifest-path = "drf_accelerator/Cargo.toml"
 module-name = "drf_accelerator.drf_accelerator"
 
 [tool.ruff]
-target-version = "py312"
+target-version = "py313"
 line-length = 88
 exclude = [ "examples" ]
 
 lint.select = [ "E", "F", "I", "UP", "W" ]
-lint.ignore = [  ]
 lint.isort.known-first-party = [ "drf_accelerator" ]
