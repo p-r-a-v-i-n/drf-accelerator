@@ -7,6 +7,8 @@ import json
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examples.settings')
 django.setup()
 
+from decimal import Decimal
+import uuid
 from api_test.models import Product
 from api_test.serializers import ProductSerializer, FastProductSerializer
 
@@ -17,7 +19,7 @@ def seed_data(count=1000):
         Product(
             name=f"Product {i}",
             description=f"Description for product {i} " * 5,
-            price=19.99,
+            price=Decimal("19.99"),
             stock=i,
             is_active=True
         )
