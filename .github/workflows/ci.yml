@@ -31,7 +31,7 @@ jobs:
         with:
           working-directory: drf_accelerator
           command: build
-          args: --release --out dist
+          args: --release --out dist ${{ matrix.os == 'ubuntu-latest' && format('-i python{0}', matrix.python-version) || '' }}
           manylinux: auto
 
       - name: Install built wheel
