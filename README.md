@@ -9,10 +9,10 @@ A high-performance Rust-backed accelerator for Django Rest Framework.
 ## Performance Benchmark
 | Method | Time (10k items) | Speedup |
 | :--- | :--- | :--- |
-| **Standard DRF** | 0.6254s | 1x |
-| **drf-accelerator** | **0.0765s** | **~8.2x** |
+| **Standard DRF** | 0.8884s | 1x |
+| **drf-accelerator** | **0.1229s** | **~8.2x** |
 
-*Benchmark run on 10,000 Product models with 6 fields including DateTime in the `examples` project.*
+*Benchmark run on 10,000 Product models with 8 fields (including DateTime, UUID, and Decimal) in the `examples` project.*
 
 ## Installation & Setup
 
@@ -72,7 +72,7 @@ To maintain high performance and safety, the following are **not supported**:
 - **Dotted Sources**: `source="user.profile.age"` will error.
 - **Nested Serializers**: Cannot be used inside an accelerated serializer.
 - **Method Fields**: `SerializerMethodField` is not supported.
-- **Complex Types**: Only `int`, `str`, `float`, `bool`, `None`, `datetime`, `date`, and `time` are supported. Other types (like `Decimal`) will trigger a `TypeError`.
+- **Complex Types**: Only `int`, `str`, `float`, `bool`, `None`, `datetime`, `date`, `time`, `uuid`, and `decimal` are supported.
 
 ## How it works
 The Mixin swaps the standard DRF `ListSerializer` for a `FastListSerializer` that offloads the object-to-dict conversion loop to a Rust extension using PyO3. This significantly reduces Python interpreter overhead for large list responses.
