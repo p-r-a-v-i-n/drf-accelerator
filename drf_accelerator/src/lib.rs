@@ -9,11 +9,8 @@ struct FastSerializer {
 }
 
 /// Format a datetime as ISO 8601 string with timezone.
-/// Uses PyO3's native accessors - NO Python getattr calls!
-/// Output: "YYYY-MM-DDTHH:MM:SS.ffffff+HH:MM" or "YYYY-MM-DDTHH:MM:SS.ffffffZ"
 #[inline]
 fn format_datetime(dt: &Bound<'_, PyDateTime>) -> PyResult<String> {
-    // Direct C struct access via PyDateAccess and PyTimeAccess traits
     let year = dt.get_year();
     let month = dt.get_month();
     let day = dt.get_day();
@@ -22,9 +19,7 @@ fn format_datetime(dt: &Bound<'_, PyDateTime>) -> PyResult<String> {
     let second = dt.get_second();
     let microsecond = dt.get_microsecond();
 
-    // Handle timezone
     let tz_suffix = if let Some(tzinfo) = dt.get_tzinfo() {
-        // Get UTC offset - this requires calling Python method
         let offset = tzinfo.call_method1("utcoffset", (dt,))?;
         if offset.is_none() {
             String::new()
@@ -59,11 +54,8 @@ fn format_datetime(dt: &Bound<'_, PyDateTime>) -> PyResult<String> {
 }
 
 /// Format a date as ISO 8601 string.
-/// Uses PyO3's native accessors - NO Python getattr calls!
-/// Output: "YYYY-MM-DD"
 #[inline]
 fn format_date(d: &Bound<'_, PyDate>) -> String {
-    // Direct C struct access via PyDateAccess trait
     let year = d.get_year();
     let month = d.get_month();
     let day = d.get_day();
@@ -71,11 +63,8 @@ fn format_date(d: &Bound<'_, PyDate>) -> String {
 }
 
 /// Format a time as ISO 8601 string.
-/// Uses PyO3's native accessors - NO Python getattr calls!
-/// Output: "HH:MM:SS.ffffff" or "HH:MM:SS"
 #[inline]
 fn format_time(t: &Bound<'_, PyTime>) -> String {
-    // Direct C struct access via PyTimeAccess trait
     let hour = t.get_hour();
     let minute = t.get_minute();
     let second = t.get_second();
@@ -113,7 +102,6 @@ impl FastSerializer {
                 {
                     dict.set_item(output_name, val_obj)?;
                 } else if val_obj.is_instance_of::<PyDateTime>() {
-                    // DateTime must be checked before Date (datetime is subclass of date)
                     let dt = val_obj.downcast::<PyDateTime>()?;
                     let iso_str = format_datetime(dt)?;
                     dict.set_item(output_name, iso_str)?;

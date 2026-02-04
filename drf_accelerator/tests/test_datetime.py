@@ -1,4 +1,5 @@
 """Unit tests for DateTime serialization in drf_accelerator."""
+
 import datetime
 from datetime import timezone
 
@@ -40,7 +41,9 @@ def test_datetime_with_microseconds():
 def test_datetime_utc():
     """Test UTC datetime serialization."""
     obj = SimpleObject(
-        created_at=datetime.datetime(2026, 1, 23, 14, 30, 45, tzinfo=datetime.UTC)
+        created_at=datetime.datetime(
+            2026, 1, 23, 14, 30, 45, tzinfo=datetime.timezone.utc
+        )
     )
     serializer = FastSerializer([("created_at", "created_at")])
     result = serializer.serialize([obj])

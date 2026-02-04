@@ -44,7 +44,7 @@ manifest-path = "drf_accelerator/Cargo.toml"
 module-name = "drf_accelerator.drf_accelerator"
 
 [tool.ruff]
-target-version = "py313"
+target-version = "py310"
 line-length = 88
 exclude = [ "examples" ]
 
