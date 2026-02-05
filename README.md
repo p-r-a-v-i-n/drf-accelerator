@@ -9,8 +9,8 @@ A high-performance Rust-backed accelerator for Django Rest Framework.
 ## Performance Benchmark
 | Method | Time (10k items) | Speedup |
 | :--- | :--- | :--- |
-| **Standard DRF** | 0.8884s | 1x |
-| **drf-accelerator** | **0.1229s** | **~8.2x** |
+| **Standard DRF** | 0.5871s | 1x |
+| **drf-accelerator** | **0.0528s** | **~11.1x** |
 
 *Benchmark run on 10,000 Product models with 8 fields (including DateTime, UUID, and Decimal) in the `examples` project.*
 
