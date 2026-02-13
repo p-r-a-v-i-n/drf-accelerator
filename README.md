@@ -6,13 +6,13 @@
 
 A high-performance Rust-backed accelerator for Django Rest Framework.
 
-## Performance Benchmark
-| Method | Time (10k items) | Speedup |
-| :--- | :--- | :--- |
-| **Standard DRF** | 0.5871s | 1x |
-| **drf-accelerator** | **0.0528s** | **~11.1x** |
+## Performance Benchmark (1,000 items)
+| Method | Primitives (1k) | Complex (1k) | Speedup |
+| :--- | :--- | :--- | :--- |
+| **Standard DRF** | 4.63ms | 38.4ms | 1x |
+| **drf-accelerator** | **0.26ms** | **3.2ms** | **~12x to ~17x** |
 
-*Benchmark run on 10,000 Product models with 8 fields (including DateTime, UUID, and Decimal) in the `examples` project.*
+*Benchmark run on 1,000 objects with 6 fields (including DateTime, UUID, and Decimal) using `pytest-benchmark`.*
 
 ## Installation & Setup
 
@@ -47,11 +47,10 @@ If you want to run the benchmarks yourself:
    cd ..
    ```
 
-2. **Setup and Run Benchmark**:
+2. **Run Benchmarks**:
    ```bash
-   cd examples
-   python manage.py migrate
-   python bench.py
+   cd drf_accelerator
+   pytest benchmarks/ -v --benchmark-only
    ```
 
 ## Usage

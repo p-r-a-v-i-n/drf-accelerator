@@ -41,11 +41,11 @@ jobs:
 
       - name: Install test dependencies
         run: |
-          pip install pytest djangorestframework django
+          pip install pytest djangorestframework django pytest-benchmark pytest-codspeed
 
       - name: Run tests
         working-directory: drf_accelerator
-        run: pytest
+        run: pytest --ignore=benchmarks/
 
   lint:
     runs-on: ubuntu-latest
