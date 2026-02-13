@@ -35,6 +35,8 @@ dev = [
 
 test = [
   "pytest",
+  "pytest-benchmark",
+  "pytest-codspeed",
 ]
 
 [tool.maturin]

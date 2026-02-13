@@ -1,38 +1,20 @@
 use pyo3::prelude::*;
 use pyo3::types::{PyDict, PyList, PyType, PyDateTime, PyDate, PyTime, PyString, PyInt, PyFloat, PyBool};
+use pyo3::sync::GILOnceCell;
 use crate::formatters::{format_datetime, format_date, format_time};
+
+static UUID_TYPE: GILOnceCell<Py<PyType>> = GILOnceCell::new();
+static DECIMAL_TYPE: GILOnceCell<Py<PyType>> = GILOnceCell::new();
 
 #[pyclass]
 pub struct FastSerializer {
     fields: Vec<(Py<PyString>, Py<PyString>, String, String)>,
-    uuid_type: Option<Py<PyType>>,
-    decimal_type: Option<Py<PyType>>,
 }
 
 #[pymethods]
 impl FastSerializer {
     #[new]
     pub fn new(py: Python<'_>, fields: Vec<(String, String)>) -> PyResult<Self> {
-        let uuid_type = match py.import("uuid") {
-            Ok(module) => {
-                match module.getattr("UUID") {
-                    Ok(cls) => Some(cls.downcast::<PyType>()?.clone().unbind()),
-                    Err(_) => None,
-                }
-            }
-            Err(_) => None,
-        };
-
-        let decimal_type = match py.import("decimal") {
-            Ok(module) => {
-                match module.getattr("Decimal") {
-                    Ok(cls) => Some(cls.downcast::<PyType>()?.clone().unbind()),
-                    Err(_) => None,
-                }
-            }
-            Err(_) => None,
-        };
-
         let mut cached_fields = Vec::with_capacity(fields.len());
         for (out, src) in fields {
             let out_py = PyString::new(py, out.as_str()).unbind();
@@ -42,8 +24,6 @@ impl FastSerializer {
 
         Ok(FastSerializer {
             fields: cached_fields,
-            uuid_type,
-            decimal_type,
         })
     }
 
@@ -79,19 +59,21 @@ impl FastSerializer {
                 } else {
                     let mut handled = false;
                     
-                    if let Some(ref uuid_cls) = self.uuid_type {
-                        if val_obj.is_instance(uuid_cls.bind(py))? {
-                            dict.set_item(output_name_py, val_obj.str()?)?;
-                            handled = true;
-                        }
+                    let uuid_cls = UUID_TYPE.get_or_init(py, || {
+                        py.import("uuid").and_then(|m| m.getattr("UUID")).and_then(|c| c.extract::<Py<PyType>>()).unwrap()
+                    });
+                    if val_obj.as_any().is_instance(uuid_cls.bind(py))? {
+                        dict.set_item(output_name_py, val_obj.str()?)?;
+                        handled = true;
                     }
 
                     if !handled {
-                        if let Some(ref decimal_cls) = self.decimal_type {
-                            if val_obj.is_instance(decimal_cls.bind(py))? {
-                                dict.set_item(output_name_py, val_obj.str()?)?;
-                                handled = true;
-                            }
+                        let decimal_cls = DECIMAL_TYPE.get_or_init(py, || {
+                            py.import("decimal").and_then(|m| m.getattr("Decimal")).and_then(|c| c.extract::<Py<PyType>>()).unwrap()
+                        });
+                        if val_obj.as_any().is_instance(decimal_cls.bind(py))? {
+                            dict.set_item(output_name_py, val_obj.str()?)?;
+                            handled = true;
                         }
                     }
 

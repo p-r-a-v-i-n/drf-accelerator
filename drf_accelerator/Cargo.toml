@@ -11,6 +11,5 @@ name = "drf_accelerator"
 crate-type = ["cdylib"]
 
 [dependencies]
-pyo3 = { version = "0.23.3", features = ["extension-module"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
+pyo3 = { version = "0.23.3", features = ["extension-module", "chrono"] }
+chrono = "0.4"
