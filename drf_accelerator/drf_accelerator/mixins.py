@@ -11,38 +11,31 @@ class FastListSerializer(ListSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._fast_field_config = self._build_field_config()
+        # Build the Rust serializer once per DRF serializer instance.
+        self._fast_serializer = FastSerializer(self._fast_field_config)
 
     def _build_field_config(self):
         child = self.child
         config = []
+        from rest_framework.serializers import BaseSerializer, SerializerMethodField
+
         for field_name, field in child.fields.items():
             source = field.source or field_name
 
-            if "." in source:
-                raise NotImplementedError(
-                    f"FastSerializer does not support dotted sources: '{source}'. "
-                    f"Field: '{field_name}'"
-                )
-
-            from rest_framework.serializers import BaseSerializer, SerializerMethodField
-
-            if isinstance(field, BaseSerializer):
-                raise NotImplementedError(
-                    f"FastSerializer does not support nested serializers: "
-                    f"'{field_name}'"
-                )
             if isinstance(field, SerializerMethodField):
-                raise NotImplementedError(
-                    f"FastSerializer does not support SerializerMethodField: "
-                    f"'{field_name}'"
-                )
+                method = getattr(child, field.method_name)
+                config.append((field_name, source, "method", method))
+            elif isinstance(field, BaseSerializer):
+                config.append((field_name, source, "nested", field))
+            elif "." in source:
+                config.append((field_name, source, "dotted", field))
+            else:
+                config.append((field_name, source, "simple", field))
 
-            config.append((field_name, source))
         return config
 
     def to_representation(self, data):
-        serializer = FastSerializer(self._fast_field_config)
-        return serializer.serialize(data)
+        return self._fast_serializer.serialize(data)
 
 
 class FastSerializationMixin:

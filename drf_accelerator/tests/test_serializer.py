@@ -10,7 +10,7 @@ class SimpleObject:
 
 
 def test_fast_serializer_basic():
-    fields = [("id", "id"), ("name", "name")]
+    fields = [("id", "id", "simple", None), ("name", "name", "simple", None)]
     serializer = FastSerializer(fields)
 
     obj = SimpleObject(id=1, name="Test")
@@ -22,7 +22,13 @@ def test_fast_serializer_basic():
 
 
 def test_fast_serializer_primitives():
-    fields = [("s", "s"), ("i", "i"), ("f", "f"), ("b", "b"), ("n", "n")]
+    fields = [
+        ("s", "s", "simple", None),
+        ("i", "i", "simple", None),
+        ("f", "f", "simple", None),
+        ("b", "b", "simple", None),
+        ("n", "n", "simple", None),
+    ]
     serializer = FastSerializer(fields)
 
     obj = SimpleObject(s="string", i=42, f=3.14, b=True, n=None)
@@ -36,7 +42,7 @@ def test_fast_serializer_primitives():
 
 
 def test_fast_serializer_unsupported_type():
-    fields = [("d", "d")]
+    fields = [("d", "d", "simple", None)]
     serializer = FastSerializer(fields)
 
     obj = SimpleObject(d=[1, 2, 3])
@@ -47,7 +53,7 @@ def test_fast_serializer_unsupported_type():
 
 
 def test_fast_serializer_missing_attribute():
-    fields = [("m", "missing")]
+    fields = [("m", "missing", "simple", None)]
     serializer = FastSerializer(fields)
 
     obj = SimpleObject()
