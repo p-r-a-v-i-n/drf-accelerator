@@ -22,7 +22,13 @@ def test_fast_serializer_basic():
 
 
 def test_fast_serializer_primitives():
-    fields = [("s", "s", "simple", None), ("i", "i", "simple", None), ("f", "f", "simple", None), ("b", "b", "simple", None), ("n", "n", "simple", None)]
+    fields = [
+        ("s", "s", "simple", None),
+        ("i", "i", "simple", None),
+        ("f", "f", "simple", None),
+        ("b", "b", "simple", None),
+        ("n", "n", "simple", None),
+    ]
     serializer = FastSerializer(fields)
 
     obj = SimpleObject(s="string", i=42, f=3.14, b=True, n=None)

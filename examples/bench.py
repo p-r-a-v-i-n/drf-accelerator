@@ -8,19 +8,23 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'examples.settings')
 django.setup()
 
 from decimal import Decimal
-import uuid
-from api_test.models import Product
+from api_test.models import Product, Category
 from api_test.serializers import ProductSerializer, FastProductSerializer
 
 def seed_data(count=1000):
     print(f"Seeding {count} products...")
     Product.objects.all().delete()
+    Category.objects.all().delete()
+    
+    category = Category.objects.create(name="Electronics")
+    
     products = [
         Product(
             name=f"Product {i}",
             description=f"Description for product {i} " * 5,
             price=Decimal("19.99"),
             stock=i,
+            category=category if i % 2 == 0 else None,
             is_active=True
         )
         for i in range(count)

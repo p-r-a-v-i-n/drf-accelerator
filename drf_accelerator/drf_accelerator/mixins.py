@@ -18,7 +18,7 @@ class FastListSerializer(ListSerializer):
         child = self.child
         config = []
         from rest_framework.serializers import BaseSerializer, SerializerMethodField
-        
+
         for field_name, field in child.fields.items():
             source = field.source or field_name
 
@@ -31,7 +31,7 @@ class FastListSerializer(ListSerializer):
                 config.append((field_name, source, "dotted", field))
             else:
                 config.append((field_name, source, "simple", field))
-                
+
         return config
 
     def to_representation(self, data):
