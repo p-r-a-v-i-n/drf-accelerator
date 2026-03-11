@@ -1,33 +1,41 @@
 # DRF Accelerator
 
-> [!CAUTION]
-> **Experimental / Under Development**
-> This project is currently an experiment to improve DRF performance using Rust. It is NOT production-ready and has strict scope limitations.
+Speed up Django REST Framework list serialization (`many=True`) by moving the hot object-to-dict loop into a Rust extension (PyO3).
 
-A high-performance Rust-backed accelerator for Django Rest Framework.
+## What You Get
+- Big wins on large list responses where most fields are primitives (`str/int/float/bool/None`) and simple conversions.
+- No changes to your API output: you still get standard DRF `serializer.data` structures.
+- Minimal adoption: add one mixin to your serializer class.
 
-## Performance Benchmark (1,000 items)
-| Method | Primitives (1k) | Complex (1k) | Speedup |
-| :--- | :--- | :--- | :--- |
-| **Standard DRF** | 4.63ms | 38.4ms | 1x |
-| **drf-accelerator** | **0.26ms** | **3.2ms** | **~12x to ~17x** |
+## Performance (Run Your Own)
+Benchmarks are highly workload- and machine-dependent. This repo includes both:
+- A micro-benchmark of the Rust loop: `test_bench_fast_serializer` vs `test_bench_standard_serializer`.
+- An end-to-end DRF benchmark (what users actually run): `test_bench_e2e_fast_mixin` vs `test_bench_e2e_standard`.
 
-*Benchmark run on 1,000 objects with 6 fields (including DateTime, UUID, and Decimal) using `pytest-benchmark`.*
+Run:
+```bash
+cd drf_accelerator
+pytest benchmarks/ -v --benchmark-only
+```
 
 ## Installation & Setup
 
-### For Users (Stable)
-Install directly from PyPI:
+### Install
+Install from PyPI:
 
 ```bash
 pip install drf-accelerator
 ```
 
 > [!NOTE]
-> Since this is a Rust extension, you will need a modern Python environment. Pre-built wheels are provided for common platforms.
+> This is a Rust extension. If a pre-built wheel is not available for your platform/Python version, you will need a Rust toolchain to build from source.
+
+## Compatibility
+- Python: CPython 3.10–3.13 (`requires-python >=3.10,<3.14`)
+- DRF: `djangorestframework>=3.12`
 
 ### From Source
-If you want to install the latest development version:
+If you want to build locally:
 
 1. **Prerequisites**: Ensure you have [Rust](https://www.rust-lang.org/tools/install) installed.
 2. **Clone & Install**:
@@ -66,12 +74,23 @@ class MySerializer(FastSerializationMixin, serializers.ModelSerializer):
         fields = ["id", "title", "author", "is_published"]
 ```
 
-## Limitations (Strict)
-To maintain high performance and safety, the following are **not supported**:
-- **Dotted Sources**: `source="user.profile.age"` will error.
-- **Nested Serializers**: Cannot be used inside an accelerated serializer.
-- **Method Fields**: `SerializerMethodField` is not supported.
-- **Complex Types**: Only `int`, `str`, `float`, `bool`, `None`, `datetime`, `date`, `time`, `uuid`, and `decimal` are supported.
+## Production Notes
+- Measure on your actual serializers and payload sizes; speedups vary a lot.
+- Biggest wins are typically list endpoints returning 100s–10,000s of items.
+- If your deployment platform doesn’t have wheels, add Rust to your build pipeline (or build wheels in CI).
+
+## Scope
+- Accelerates serialization of lists (`many=True`). Single-object serializers are unchanged.
+- This is about output serialization only (not validation, parsing, or saving).
+
+## Supported Features
+- Field sources: normal fields, dotted sources (`source="a.b.c"`), `SerializerMethodField`, and nested serializers.
+- Fast paths: `str`, `int`, `float`, `bool`, `None`, `datetime/date/time`, `uuid.UUID`, `decimal.Decimal`.
+- Fallback: other values call the DRF field’s cached `to_representation(value)`.
+
+## Current Limitations
+- Dotted sources, nested serializers, and `None` values are supported, but may see smaller speedups because they involve more Python work per item.
+- `FastSerializer` is primarily an internal implementation detail of the DRF mixin. If you construct it manually and pass `None` as the field object, only the fast-path types work; otherwise it raises `TypeError("unsupported type")` because there is no `to_representation` fallback.
 
 ## How it works
 The Mixin swaps the standard DRF `ListSerializer` for a `FastListSerializer` that offloads the object-to-dict conversion loop to a Rust extension using PyO3. This significantly reduces Python interpreter overhead for large list responses.
