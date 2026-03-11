@@ -22,7 +22,7 @@ class SimpleObject:
 def test_datetime_naive():
     """Test naive datetime serialization (no timezone)."""
     obj = SimpleObject(created_at=datetime.datetime(2026, 1, 23, 14, 30, 45))
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert len(result) == 1
@@ -32,7 +32,7 @@ def test_datetime_naive():
 def test_datetime_with_microseconds():
     """Test datetime with microseconds."""
     obj = SimpleObject(created_at=datetime.datetime(2026, 1, 23, 14, 30, 45, 123456))
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["created_at"] == "2026-01-23T14:30:45.123456"
@@ -45,7 +45,7 @@ def test_datetime_utc():
             2026, 1, 23, 14, 30, 45, tzinfo=datetime.timezone.utc
         )
     )
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["created_at"] == "2026-01-23T14:30:45Z"
@@ -55,7 +55,7 @@ def test_datetime_positive_offset():
     """Test datetime with positive timezone offset (e.g., IST +5:30)."""
     ist = timezone(datetime.timedelta(hours=5, minutes=30))
     obj = SimpleObject(created_at=datetime.datetime(2026, 1, 23, 20, 0, 0, tzinfo=ist))
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["created_at"] == "2026-01-23T20:00:00+05:30"
@@ -65,7 +65,7 @@ def test_datetime_negative_offset():
     """Test datetime with negative timezone offset (e.g., EST -5:00)."""
     est = timezone(datetime.timedelta(hours=-5))
     obj = SimpleObject(created_at=datetime.datetime(2026, 1, 23, 9, 30, 0, tzinfo=est))
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["created_at"] == "2026-01-23T09:30:00-05:00"
@@ -79,7 +79,7 @@ def test_datetime_negative_offset():
 def test_date_only():
     """Test date serialization."""
     obj = SimpleObject(birth_date=datetime.date(1990, 5, 15))
-    serializer = FastSerializer([("birth_date", "birth_date")])
+    serializer = FastSerializer([("birth_date", "birth_date", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["birth_date"] == "1990-05-15"
@@ -93,7 +93,7 @@ def test_date_only():
 def test_time_only():
     """Test time serialization."""
     obj = SimpleObject(start_time=datetime.time(9, 30, 0))
-    serializer = FastSerializer([("start_time", "start_time")])
+    serializer = FastSerializer([("start_time", "start_time", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["start_time"] == "09:30:00"
@@ -102,7 +102,7 @@ def test_time_only():
 def test_time_with_microseconds():
     """Test time with microseconds."""
     obj = SimpleObject(start_time=datetime.time(9, 30, 0, 500000))
-    serializer = FastSerializer([("start_time", "start_time")])
+    serializer = FastSerializer([("start_time", "start_time", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["start_time"] == "09:30:00.500000"
@@ -122,9 +122,9 @@ def test_multiple_datetime_fields():
     )
     serializer = FastSerializer(
         [
-            ("created_at", "created_at"),
-            ("updated_at", "updated_at"),
-            ("birth_date", "birth_date"),
+            ("created_at", "created_at", "simple", None),
+            ("updated_at", "updated_at", "simple", None),
+            ("birth_date", "birth_date", "simple", None),
         ]
     )
     result = serializer.serialize([obj])
@@ -137,7 +137,7 @@ def test_multiple_datetime_fields():
 def test_none_datetime():
     """Test None datetime value."""
     obj = SimpleObject(created_at=None)
-    serializer = FastSerializer([("created_at", "created_at")])
+    serializer = FastSerializer([("created_at", "created_at", "simple", None)])
     result = serializer.serialize([obj])
 
     assert result[0]["created_at"] is None
@@ -153,10 +153,10 @@ def test_mixed_primitives_and_datetime():
     )
     serializer = FastSerializer(
         [
-            ("id", "id"),
-            ("name", "name"),
-            ("created_at", "created_at"),
-            ("is_active", "is_active"),
+            ("id", "id", "simple", None),
+            ("name", "name", "simple", None),
+            ("created_at", "created_at", "simple", None),
+            ("is_active", "is_active", "simple", None),
         ]
     )
     result = serializer.serialize([obj])

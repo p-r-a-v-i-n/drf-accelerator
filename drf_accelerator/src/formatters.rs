@@ -1,34 +1,38 @@
-use pyo3::prelude::*;
-use pyo3::types::{PyDateTime, PyDate, PyTime, PyDateAccess, PyTimeAccess};
 use chrono::{DateTime, FixedOffset, NaiveDateTime, Timelike};
+use pyo3::prelude::*;
+use pyo3::types::{PyDate, PyDateAccess, PyDateTime, PyTime, PyTimeAccess};
 
 #[inline]
 pub fn format_datetime(dt: &Bound<'_, PyDateTime>) -> PyResult<String> {
     if let Ok(aware_dt) = dt.extract::<DateTime<FixedOffset>>() {
         let mut s = aware_dt.format("%Y-%m-%dT%H:%M:%S").to_string();
-        
-        // Handle microseconds
+
         let micro = aware_dt.nanosecond() / 1000;
+
         if micro > 0 {
             s.push_str(&format!(".{:06}", micro));
         }
-        
-        // Handle timezone suffix
+
         let offset = *aware_dt.offset();
+
         if offset.local_minus_utc() == 0 {
             s.push('Z');
         } else {
             s.push_str(&offset.to_string());
         }
+
         Ok(s)
     } else {
-        // Fallback for naive datetime or if extraction fails
         let naive = dt.extract::<NaiveDateTime>()?;
+
         let mut s = naive.format("%Y-%m-%dT%H:%M:%S").to_string();
+
         let micro = naive.nanosecond() / 1000;
+
         if micro > 0 {
             s.push_str(&format!(".{:06}", micro));
         }
+
         Ok(s)
     }
 }
