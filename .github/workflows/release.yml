@@ -30,16 +30,15 @@ jobs:
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
-          working-directory: drf_accelerator
           command: build
-          args: --release --out dist ${{ matrix.os == 'ubuntu-latest' && format('-i python{0}', matrix.python-version) || '' }}
+          args: --release --out dist --manifest-path drf_accelerator/Cargo.toml ${{ matrix.os == 'ubuntu-latest' && format('-i python{0}', matrix.python-version) || '' }}
           manylinux: auto
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
           name: wheels-${{ matrix.os }}-py${{ matrix.python-version }}
-          path: drf_accelerator/dist/*.whl
+          path: dist/*.whl
           if-no-files-found: error
 
   build-sdist:
@@ -98,6 +97,7 @@ jobs:
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           packages-dir: dist
+          skip-existing: true
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
