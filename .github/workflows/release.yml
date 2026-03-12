@@ -51,15 +51,14 @@ jobs:
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
-          working-directory: drf_accelerator
           command: sdist
-          args: --out dist
+          args: --out dist --manifest-path drf_accelerator/Cargo.toml
 
       - name: Upload sdist
         uses: actions/upload-artifact@v4
         with:
           name: sdist
-          path: drf_accelerator/dist/*.tar.gz
+          path: dist/*.tar.gz
           if-no-files-found: error
 
   publish:
