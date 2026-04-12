@@ -10,3 +10,11 @@ repos:
     rev: v2.11.1
     hooks:
       - id: pyproject-fmt
+
+  - repo: https://github.com/doublify/pre-commit-rust
+    rev: v1.0
+    hooks:
+      - id: fmt
+        args: [--manifest-path, drf_accelerator/Cargo.toml, --]
+      - id: clippy
+        args: [--manifest-path, drf_accelerator/Cargo.toml, --]
