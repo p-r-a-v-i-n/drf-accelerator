@@ -32,6 +32,11 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: drf_accelerator
+
       - name: Build and Install Wheel
         uses: PyO3/maturin-action@v1
         with:
@@ -72,3 +77,21 @@ jobs:
         run: |
           ruff check .
           ruff format --check .
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Rust Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: drf_accelerator
+
+      - name: Run cargo fmt
+        working-directory: drf_accelerator
+        run: cargo fmt --all -- --check
+
+      - name: Run cargo clippy
+        working-directory: drf_accelerator
+        run: cargo clippy --all-targets --all-features -- -D warnings

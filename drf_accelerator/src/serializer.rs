@@ -219,7 +219,9 @@ impl FastSerializer {
 
                 // UUID/Decimal occur frequently in DRF payloads; checking them before datetime/date/time
                 // avoids extra type checks on those fields.
-                if value.as_any().is_instance(uuid_cls)? || value.as_any().is_instance(decimal_cls)? {
+                if value.as_any().is_instance(uuid_cls)?
+                    || value.as_any().is_instance(decimal_cls)?
+                {
                     dict.set_item(&field.out_name, value.str()?)?;
                     continue;
                 }
