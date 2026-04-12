@@ -1,0 +1,36 @@
+site_name: DRF Accelerator
+site_description: A high-performance Rust-backed accelerator for Django REST Framework.
+repo_url: https://github.com/p-r-a-v-i-n/drf-accelerator
+
+theme:
+  name: material
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+
+markdown_extensions:
+  - pymdownx.snippets:
+      base_path: .
+
+nav:
+  - Home: index.md
+  - How It Works: how-it-works.md
+  - Changelog: changelog.md
+  - Contributing: contributing.md
+  - Releasing: releasing.md

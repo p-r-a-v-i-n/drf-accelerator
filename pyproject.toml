@@ -52,6 +52,11 @@ test = [
   "pytest-codspeed",
 ]
 
+docs = [
+  "mkdocs",
+  "mkdocs-material",
+]
+
 [tool.maturin]
 python-source = "drf_accelerator"
 manifest-path = "drf_accelerator/Cargo.toml"
