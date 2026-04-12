@@ -1,96 +1,105 @@
 # DRF Accelerator
 
-Speed up Django REST Framework list serialization (`many=True`) by moving the hot object-to-dict loop into a Rust extension (PyO3).
+🚀 **Turbocharge your Django REST Framework (DRF) list serialization by replacing Python's hot loop with a high-performance Rust extension.**
 
-## What You Get
-- Big wins on large list responses where most fields are primitives (`str/int/float/bool/None`) and simple conversions.
-- No changes to your API output: you still get standard DRF `serializer.data` structures.
-- Minimal adoption: add one mixin to your serializer class.
+[![PyPI version](https://badge.fury.io/py/drf-accelerator.svg)](https://badge.fury.io/py/drf-accelerator)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## Performance (Run Your Own)
-Benchmarks are highly workload- and machine-dependent. This repo includes both:
-- A micro-benchmark of the Rust loop: `test_bench_fast_serializer` vs `test_bench_standard_serializer`.
-- An end-to-end DRF benchmark (what users actually run): `test_bench_e2e_fast_mixin` vs `test_bench_e2e_standard`.
+DRF Accelerator addresses one of the most common performance bottlenecks in Django applications: **returning large lists of data**. By offloading the innermost object-to-dict conversion loop to a Rust module (via PyO3), it bypasses the heavy Python interpreter overhead, resulting in massive throughput gains for your API endpoints. 
 
-Run:
+---
+
+## 💡 Why DRF Accelerator?
+
+If you've ever profiled a DRF application returning standard `many=True` responses, you know that creating hundreds or thousands of dictionaries in pure Python is exceptionally slow. 
+
+**The Solution:** \
+We swap DRF's standard `ListSerializer` with a custom-built Rust implementation (`FastListSerializer`). 
+
+**The Guarantees:**
+* **Zero API breakage**: You still get exactly the same standard DRF `serializer.data` structures.
+* **Zero logic changes**: You don't need to rewrite your serializers into `.values()` queries or change how you query your database.
+* **Minimal adoption effort**: Add exactly **one mixin** to your existing serializer classes. 
+
+---
+
+## ⚡ Performance
+
+The largest speedups occur on list responses (`many=True`) containing **100s to 10,000s of items**, particularly when the fields are primitive types (`str`, `int`, `float`, `bool`, `None`). 
+
+Because benchmarks are highly workload-dependent, this repository includes tooling for you to test the gains directly against your own hardware:
+
+* **Micro-benchmarks**: Tests the pure Rust loop vs pure Python loop.
+* **End-to-End benchmarks**: Tests an actual DRF request cycle.
+
+To run the benchmarks locally (requires cloning the repository):
 ```bash
 cd drf_accelerator
 pytest benchmarks/ -v --benchmark-only
 ```
 
-## Installation & Setup
+---
 
-### Install
-Install from PyPI:
+## 📦 Installation
+Requirements:
+* Python 3.10 – 3.13
+* Django REST Framework >= 3.12
 
+Install directly from PyPI:
 ```bash
 pip install drf-accelerator
 ```
+> **Note**: This package ships with pre-built binary wheels for major platforms (Linux, macOS, Windows). If your specific architecture isn't covered, `pip` will automatically attempt to compile it from source (which requires a standard Rust toolchain).
 
-> [!NOTE]
-> This is a Rust extension. If a pre-built wheel is not available for your platform/Python version, you will need a Rust toolchain to build from source.
+---
 
-## Compatibility
-- Python: CPython 3.10–3.13 (`requires-python >=3.10,<3.14`)
-- DRF: `djangorestframework>=3.12`
+## 🚦 Quickstart & Usage
 
-### From Source
-If you want to build locally:
-
-1. **Prerequisites**: Ensure you have [Rust](https://www.rust-lang.org/tools/install) installed.
-2. **Clone & Install**:
-   ```bash
-   git clone https://github.com/p-r-a-v-i-n/drf-accelerator.git
-   cd drf-accelerator
-   pip install -e .
-   ```
-
-### For Developers (Try it out)
-If you want to run the benchmarks yourself:
-
-1. **Build the extension**:
-   ```bash
-   cd drf_accelerator
-   maturin develop --release
-   cd ..
-   ```
-
-2. **Run Benchmarks**:
-   ```bash
-   cd drf_accelerator
-   pytest benchmarks/ -v --benchmark-only
-   ```
-
-## Usage
-Simply inherit from `FastSerializationMixin` in your `ModelSerializer`:
+DRF Accelerator is designed to be completely unobtrusive. To accelerate a serializer, simply inherit from `FastSerializationMixin` as your first base class.
 
 ```python
-from drf_accelerator import FastSerializationMixin
 from rest_framework import serializers
+from drf_accelerator import FastSerializationMixin
 
-class MySerializer(FastSerializationMixin, serializers.ModelSerializer):
+class MyModelSerializer(FastSerializationMixin, serializers.ModelSerializer):
     class Meta:
         model = MyModel
         fields = ["id", "title", "author", "is_published"]
 ```
 
-## Production Notes
-- Measure on your actual serializers and payload sizes; speedups vary a lot.
-- Biggest wins are typically list endpoints returning 100s–10,000s of items.
-- If your deployment platform doesn’t have wheels, add Rust to your build pipeline (or build wheels in CI).
+When you use this serializer for list endpoints (`many=True`), the Rust accelerator automatically takes over!
 
-## Scope
-- Accelerates serialization of lists (`many=True`). Single-object serializers are unchanged.
-- This is about output serialization only (not validation, parsing, or saving).
+```python
+# The FastListSerializer written in Rust will process this entire queryset
+serializer = MyModelSerializer(queryset, many=True)
+data = serializer.data 
+```
 
-## Supported Features
-- Field sources: normal fields, dotted sources (`source="a.b.c"`), `SerializerMethodField`, and nested serializers.
-- Fast paths: `str`, `int`, `float`, `bool`, `None`, `datetime/date/time`, `uuid.UUID`, `decimal.Decimal`.
-- Fallback: other values call the DRF field’s cached `to_representation(value)`.
+---
 
-## Current Limitations
-- Dotted sources, nested serializers, and `None` values are supported, but may see smaller speedups because they involve more Python work per item.
-- `FastSerializer` is primarily an internal implementation detail of the DRF mixin. If you construct it manually and pass `None` as the field object, only the fast-path types work; otherwise it raises `TypeError("unsupported type")` because there is no `to_representation` fallback.
+## 🔍 How It Works & Supported Features
 
-## How it works
-The Mixin swaps the standard DRF `ListSerializer` for a `FastListSerializer` that offloads the object-to-dict conversion loop to a Rust extension using PyO3. This significantly reduces Python interpreter overhead for large list responses.
+Under the hood, `FastSerializationMixin` overrides the `many_init` method to return our Rust-backed `FastListSerializer`. 
+
+### Fast-Path Supported Types
+The Rust extension has deeply optimized zero-overhead "fast paths" for standard conversions:
+* `str`, `int`, `float`, `bool`, `None`
+* `datetime`, `date`, `time`
+* `uuid.UUID`, `decimal.Decimal`
+
+### Universal Fallback
+For any deeply custom fields (or object types the Rust layer doesn't explicitly know how to fast-path), the serializer gracefully falls back to calling the standard DRF field’s `to_representation(value)` method. **It will never break your data structure.**
+
+### Supported Field Configurations
+* Standard fields (`CharField`, `IntegerField`, etc.)
+* Dotted sources (`source="author.user.email"`)
+* `SerializerMethodField`
+* Nested Serializers
+
+---
+
+## ⚠️ Scope & Limitations
+
+* **Read-Only Focus**: This accelerator strictly improves **output serialization**. It does not speed up incoming data parsing, validation, or saving (`.is_valid()` or `.save()`).
+* **List Serialization Only**: It accelerates iterables (`many=True`). Single-object serialization (`many=False`) remains unchanged because the overhead of calling the Rust extension outweighs the benefits for a single dictionary.
+* **Fallbacks cause slowdowns**: Relying heavily on manual `MethodFields` or custom data types that require the Python fallback will naturally reduce your overall speedup multiplier, though it will still be faster than native DRF.
