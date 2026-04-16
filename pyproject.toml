@@ -61,6 +61,7 @@ docs = [
 python-source = "drf_accelerator"
 manifest-path = "drf_accelerator/Cargo.toml"
 module-name = "drf_accelerator.drf_accelerator"
+include = [ { path = "LICENSE", format = "sdist" } ]
 
 [tool.ruff]
 target-version = "py310"
