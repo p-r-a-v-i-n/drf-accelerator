@@ -5,7 +5,8 @@ build:
   tools:
     python: "3.11"
   jobs:
-    - run: pip install --group docs
+    post_create_environment:
+      - pip install mkdocs mkdocs-material
 
 mkdocs:
   configuration: mkdocs.yml
