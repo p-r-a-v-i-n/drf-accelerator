@@ -4,7 +4,7 @@ requires = [ "maturin>=1,<2" ]
 
 [project]
 name = "drf-accelerator"
-version = "0.1.1"
+version = "0.1.2"
 description = "A high-performance Rust-backed accelerator for Django REST Framework."
 readme = { file = "README.md", content-type = "text/markdown" }
 keywords = [ "djangorestframework", "drf", "performance", "serialization" ]
